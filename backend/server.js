@@ -68,7 +68,7 @@ app.get('/login', (req, res) => {
           border-radius: 12px;
           box-shadow: 0 2px 10px rgba(0,0,0,0.1);
           width: 100%;
-          max-width: 320px;
+          max-width: 380px;
         }
         h1 {
           text-align: center;
@@ -82,13 +82,13 @@ app.get('/login', (req, res) => {
           font-size: 14px;
         }
         .password-wrapper {
-          position: relative;
+          display: flex;
+          gap: 10px;
           margin-bottom: 16px;
         }
         .password-wrapper input {
-          width: 100%;
+          flex: 1;
           padding: 14px;
-          padding-right: 50px;
           font-size: 16px;
           border: 2px solid #ddd;
           border-radius: 8px;
@@ -98,19 +98,20 @@ app.get('/login', (req, res) => {
           border-color: #4CAF50;
         }
         .toggle-password {
-          position: absolute;
-          right: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: none;
-          border: none;
+          width: 50px;
+          height: 50px;
+          background: #f0f0f0;
+          border: 2px solid #ddd;
+          border-radius: 8px;
           cursor: pointer;
-          font-size: 18px;
-          color: #666;
-          padding: 4px;
+          font-size: 22px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
         }
         .toggle-password:hover {
-          color: #333;
+          background: #e0e0e0;
         }
         button {
           width: 100%;
@@ -140,7 +141,7 @@ app.get('/login', (req, res) => {
         <form method="POST" action="/login">
           <div class="password-wrapper">
             <input type="password" id="password" name="password" placeholder="Password" required autofocus>
-            <button type="button" class="toggle-password" onclick="togglePassword()">Show</button>
+            <button type="button" class="toggle-password" onclick="togglePassword()" title="Show/Hide password">&#128065;</button>
           </div>
           <button type="submit">Enter</button>
         </form>
@@ -150,10 +151,10 @@ app.get('/login', (req, res) => {
             const btn = document.querySelector('.toggle-password');
             if (input.type === 'password') {
               input.type = 'text';
-              btn.textContent = 'Hide';
+              btn.innerHTML = '&#128064;';
             } else {
               input.type = 'password';
-              btn.textContent = 'Show';
+              btn.innerHTML = '&#128065;';
             }
           }
         </script>
