@@ -1,0 +1,336 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #4CAF50;
+  --primary-dark: #45a049;
+  --danger: #f44336;
+  --text: #333;
+  --text-light: #666;
+  --text-muted: #999;
+  --bg: #f5f5f5;
+  --card: #fff;
+  --border: #e0e0e0;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app {
+  max-width: 500px;
+  margin: 0 auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+header {
+  background: var(--primary);
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+header h1 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.logout-btn {
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+  padding: 8px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.logout-btn:hover {
+  opacity: 1;
+}
+
+/* Add Form */
+.add-form {
+  display: flex;
+  gap: 10px;
+  padding: 16px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 56px;
+  z-index: 99;
+}
+
+.input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+#item-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#item-input:focus {
+  border-color: var(--primary);
+}
+
+#add-btn {
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#add-btn:hover {
+  background: var(--primary-dark);
+}
+
+#add-btn:active {
+  transform: scale(0.98);
+}
+
+/* Suggestions dropdown */
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 4px;
+  list-style: none;
+  box-shadow: var(--shadow);
+  display: none;
+  z-index: 50;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggestions.active {
+  display: block;
+}
+
+.suggestions li {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+
+.suggestions li:last-child {
+  border-bottom: none;
+}
+
+.suggestions li:hover,
+.suggestions li.selected {
+  background: #f0f0f0;
+}
+
+/* Main List */
+main {
+  flex: 1;
+  padding: 16px;
+  padding-bottom: 32px;
+}
+
+.list-section {
+  margin-bottom: 24px;
+}
+
+.list-section h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+.item-list {
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.item:active {
+  transform: scale(0.98);
+}
+
+.item-content {
+  flex: 1;
+  padding: 16px 20px;
+  font-size: 17px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+}
+
+.item-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.item-name {
+  flex: 1;
+}
+
+.item-delete {
+  padding: 16px 20px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.item:hover .item-delete {
+  opacity: 1;
+}
+
+.item-delete:hover {
+  color: var(--danger);
+}
+
+/* Checked items styling */
+.checked-section {
+  opacity: 0.7;
+}
+
+.checked-section .item {
+  background: #fafafa;
+}
+
+.checked-section .item-checkbox {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.checked-section .item-checkbox::after {
+  content: '✓';
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.checked-section .item-name {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+/* Empty state */
+.empty-message {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 20px;
+  font-size: 15px;
+}
+
+/* Hide sections when empty */
+#checked-section {
+  display: none;
+}
+
+#checked-section.has-items {
+  display: block;
+}
+
+#empty-message {
+  display: none;
+}
+
+#active-section.empty #empty-message {
+  display: block;
+}
+
+/* Loading state */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+/* Mobile touch improvements */
+@media (max-width: 600px) {
+  .item-delete {
+    opacity: 0.5;
+  }
+
+  header {
+    padding: 12px 16px;
+  }
+
+  .add-form {
+    padding: 12px;
+  }
+
+  main {
+    padding: 12px;
+  }
+}
+
+/* Animation for new items */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.item.new {
+  animation: slideIn 0.2s ease-out;
+}
