@@ -142,6 +142,49 @@ function deleteItem(id) {
   saveDatabase();
 }
 
+// Update an item's name
+function updateItemName(id, newName) {
+  const trimmedName = newName.trim();
+
+  // Get current item
+  const results = db.exec(`SELECT * FROM items WHERE id = ?`, [id]);
+  if (results.length === 0 || results[0].values.length === 0) return null;
+
+  const columns = results[0].columns;
+  const row = results[0].values[0];
+  const item = {};
+  columns.forEach((col, i) => {
+    item[col] = row[i];
+  });
+
+  const oldName = item.name;
+
+  // Update item name
+  db.run(`UPDATE items SET name = ? WHERE id = ?`, [trimmedName, id]);
+
+  // Update history: add new name
+  db.run(`
+    INSERT INTO item_history (name, last_used_at)
+    VALUES (?, datetime('now'))
+    ON CONFLICT(name) DO UPDATE SET last_used_at = datetime('now')
+  `, [trimmedName]);
+
+  // Remove old name from history if different and not used by any other item
+  if (oldName !== trimmedName) {
+    const otherItems = db.exec(`SELECT id FROM items WHERE name = ? AND id != ?`, [oldName, id]);
+    if (otherItems.length === 0 || otherItems[0].values.length === 0) {
+      db.run(`DELETE FROM item_history WHERE name = ?`, [oldName]);
+    }
+  }
+
+  saveDatabase();
+
+  return {
+    ...item,
+    name: trimmedName
+  };
+}
+
 // Get history items for autocomplete (matching prefix)
 function getHistorySuggestions(prefix) {
   const pattern = `${prefix}%`;
@@ -182,6 +225,7 @@ module.exports = {
   addItem,
   toggleItem,
   deleteItem,
+  updateItemName,
   getHistorySuggestions,
   clearOldCheckedItems
 };

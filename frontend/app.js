@@ -11,6 +11,8 @@ const checkedSection = document.getElementById('checked-section');
 let items = [];
 let suggestions = [];
 let selectedSuggestionIndex = -1;
+let editingItemId = null;
+let longPressTimer = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -59,26 +61,133 @@ function renderItems() {
   // Add event listeners
   document.querySelectorAll('.item').forEach(itemEl => {
     const id = parseInt(itemEl.dataset.id, 10);
+    const isEditing = itemEl.classList.contains('editing');
 
-    // Toggle on click
-    itemEl.querySelector('.item-content').addEventListener('click', () => toggleItem(id));
+    if (isEditing) {
+      // Edit mode event listeners
+      const input = itemEl.querySelector('.item-edit-input');
+      const saveBtn = itemEl.querySelector('.edit-save');
+      const cancelBtn = itemEl.querySelector('.edit-cancel');
 
-    // Delete button
-    itemEl.querySelector('.item-delete').addEventListener('click', (e) => {
-      e.stopPropagation();
-      deleteItem(id);
-    });
+      // Focus input and select all text
+      input.focus();
+      input.select();
+
+      // Save on Enter, cancel on Escape
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveEdit(id, input.value);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          cancelEdit();
+        }
+      });
+
+      // Save button
+      saveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        saveEdit(id, input.value);
+      });
+
+      // Cancel button
+      cancelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cancelEdit();
+      });
+
+      // Save on blur (click outside) - but not if clicking save/cancel
+      input.addEventListener('blur', (e) => {
+        // Small delay to allow button clicks to register first
+        setTimeout(() => {
+          if (editingItemId === id) {
+            saveEdit(id, input.value);
+          }
+        }, 150);
+      });
+    } else {
+      // Normal mode event listeners
+      const itemName = itemEl.querySelector('.item-name');
+      const editBtn = itemEl.querySelector('.item-edit');
+      const deleteBtn = itemEl.querySelector('.item-delete');
+      const checkbox = itemEl.querySelector('.item-checkbox');
+
+      // Toggle on checkbox click only
+      checkbox.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleItem(id);
+      });
+
+      // Edit on text click (desktop)
+      itemName.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startEdit(id);
+      });
+
+      // Long press on item-content for mobile
+      const itemContent = itemEl.querySelector('.item-content');
+      itemContent.addEventListener('touchstart', (e) => {
+        longPressTimer = setTimeout(() => {
+          e.preventDefault();
+          startEdit(id);
+        }, 500);
+      });
+
+      itemContent.addEventListener('touchend', () => {
+        clearTimeout(longPressTimer);
+      });
+
+      itemContent.addEventListener('touchmove', () => {
+        clearTimeout(longPressTimer);
+      });
+
+      // Edit button
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startEdit(id);
+      });
+
+      // Delete button
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteItem(id);
+      });
+    }
   });
 }
 
 // Create HTML for a single item
 function createItemHTML(item) {
+  const isEditing = editingItemId === item.id;
+
+  if (isEditing) {
+    return `
+      <li class="item editing" data-id="${item.id}">
+        <div class="item-content">
+          <span class="item-checkbox"></span>
+          <input
+            type="text"
+            class="item-edit-input"
+            value="${escapeHTML(item.name)}"
+            maxlength="200"
+            aria-label="Edit item"
+          >
+        </div>
+        <div class="edit-actions">
+          <button class="edit-save" title="Save" aria-label="Save edit">✓</button>
+          <button class="edit-cancel" title="Cancel" aria-label="Cancel edit">×</button>
+        </div>
+      </li>
+    `;
+  }
+
   return `
     <li class="item" data-id="${item.id}">
       <div class="item-content">
         <span class="item-checkbox"></span>
         <span class="item-name">${escapeHTML(item.name)}</span>
       </div>
+      <button class="item-edit" title="Edit item" aria-label="Edit item">✎</button>
       <button class="item-delete" title="Delete">×</button>
     </li>
   `;
@@ -171,6 +280,70 @@ async function deleteItem(id) {
     renderItems();
   } catch (error) {
     console.error('Error deleting item:', error);
+  }
+}
+
+// Start editing an item
+function startEdit(id) {
+  editingItemId = id;
+  renderItems();
+}
+
+// Cancel editing
+function cancelEdit() {
+  editingItemId = null;
+  renderItems();
+}
+
+// Save edit
+async function saveEdit(id, newName) {
+  const trimmedName = newName.trim();
+
+  // If empty, prompt for delete confirmation
+  if (trimmedName.length === 0) {
+    const confirmed = confirm('Delete this item?');
+    if (confirmed) {
+      editingItemId = null;
+      await deleteItem(id);
+    }
+    return;
+  }
+
+  // Check if name actually changed
+  const item = items.find(i => i.id === id);
+  if (item && item.name === trimmedName) {
+    cancelEdit();
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/items/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: trimmedName })
+    });
+
+    if (response.status === 401) {
+      window.location.href = '/login';
+      return;
+    }
+
+    if (response.status === 204) {
+      // Item was deleted (empty name)
+      items = items.filter(i => i.id !== id);
+    } else if (response.ok) {
+      const updatedItem = await response.json();
+      const index = items.findIndex(i => i.id === id);
+      if (index !== -1) {
+        items[index] = updatedItem;
+      }
+    }
+
+    editingItemId = null;
+    renderItems();
+  } catch (error) {
+    console.error('Error updating item:', error);
+    cancelEdit();
   }
 }
 

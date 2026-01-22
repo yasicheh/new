@@ -223,8 +223,28 @@ main {
   flex: 1;
 }
 
+.item-edit {
+  padding: 16px 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.item:hover .item-edit {
+  opacity: 1;
+}
+
+.item-edit:hover {
+  color: var(--primary);
+}
+
 .item-delete {
   padding: 16px 20px;
+  padding-left: 8px;
   background: none;
   border: none;
   color: var(--text-muted);
@@ -239,6 +259,66 @@ main {
 }
 
 .item-delete:hover {
+  color: var(--danger);
+}
+
+/* Edit mode styles */
+.item.editing {
+  background: var(--card);
+  border: 2px solid var(--primary);
+}
+
+.item-edit-input {
+  flex: 1;
+  font-size: 17px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  outline: none;
+  font-family: inherit;
+  min-width: 0;
+}
+
+.item-edit-input:focus {
+  border-color: var(--primary);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 4px;
+  padding-right: 12px;
+}
+
+.edit-save,
+.edit-cancel {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.edit-save {
+  background: var(--primary);
+  color: white;
+}
+
+.edit-save:hover {
+  background: var(--primary-dark);
+}
+
+.edit-cancel {
+  background: #f0f0f0;
+  color: var(--text-muted);
+}
+
+.edit-cancel:hover {
+  background: #e0e0e0;
   color: var(--danger);
 }
 
@@ -302,6 +382,10 @@ main {
 
 /* Mobile touch improvements */
 @media (max-width: 600px) {
+  .item-edit {
+    opacity: 0.5;
+  }
+
   .item-delete {
     opacity: 0.5;
   }
@@ -316,6 +400,14 @@ main {
 
   main {
     padding: 12px;
+  }
+
+  .edit-actions {
+    padding-right: 8px;
+  }
+
+  .item-edit-input {
+    font-size: 16px;
   }
 }
 

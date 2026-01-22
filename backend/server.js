@@ -258,6 +258,40 @@ app.delete('/api/items/:id', requireAuth, (req, res) => {
   }
 });
 
+// Update item name
+app.patch('/api/items/:id', requireAuth, (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    if (name === undefined) {
+      return res.status(400).json({ error: 'Item name is required' });
+    }
+
+    const trimmedName = name.trim();
+
+    // Validate length
+    if (trimmedName.length > 200) {
+      return res.status(400).json({ error: 'Item name must be 200 characters or less' });
+    }
+
+    // Empty name means delete the item
+    if (trimmedName.length === 0) {
+      db.deleteItem(parseInt(id, 10));
+      return res.status(204).send();
+    }
+
+    const item = db.updateItemName(parseInt(id, 10), trimmedName);
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    res.json(item);
+  } catch (error) {
+    console.error('Error updating item:', error);
+    res.status(500).json({ error: 'Failed to update item' });
+  }
+});
+
 // Get autocomplete suggestions
 app.get('/api/suggestions', requireAuth, (req, res) => {
   try {
