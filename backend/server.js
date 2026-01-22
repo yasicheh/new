@@ -18,15 +18,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(SESSION_SECRET));
 
-// Initialize database
-db.initializeDatabase();
-
-// Clear old checked items on startup
-const cleared = db.clearOldCheckedItems();
-if (cleared > 0) {
-  console.log(`Cleared ${cleared} checked items older than 30 days`);
-}
-
 // Generate auth token from password
 function generateAuthToken(password) {
   return crypto.createHmac('sha256', SESSION_SECRET).update(password).digest('hex');
@@ -247,6 +238,21 @@ app.get('/api/suggestions', requireAuth, (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Grocery List app running at http://localhost:${PORT}`);
+async function start() {
+  await db.initializeDatabase();
+
+  // Clear old checked items on startup
+  const cleared = db.clearOldCheckedItems();
+  if (cleared > 0) {
+    console.log(`Cleared ${cleared} checked items older than 30 days`);
+  }
+
+  app.listen(PORT, () => {
+    console.log(`Grocery List app running at http://localhost:${PORT}`);
+  });
+}
+
+start().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });
