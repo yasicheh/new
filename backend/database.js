@@ -2,7 +2,10 @@ const initSqlJs = require('sql.js');
 const fs = require('fs');
 const path = require('path');
 
-const dbPath = process.env.DATABASE_URL || path.join(__dirname, '..', 'grocery.db');
+// Use Railway volume path if it exists, otherwise use local path
+const volumePath = '/app/data/grocery.db';
+const localPath = path.join(__dirname, '..', 'grocery.db');
+const dbPath = process.env.DATABASE_URL || (fs.existsSync('/app/data') ? volumePath : localPath);
 
 let db = null;
 
