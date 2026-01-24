@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Grocery List</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>🛒 Grocery List</h1>
+      <a href="/logout" class="logout-btn" title="Logout">↩</a>
+    </header>
+
+    <form id="add-form" class="add-form">
+      <div class="input-wrapper">
+        <input
+          type="text"
+          id="item-input"
+          placeholder="Add an item..."
+          autocomplete="off"
+          autocapitalize="sentences"
+        >
+        <ul id="suggestions" class="suggestions"></ul>
+      </div>
+      <button type="submit" id="add-btn">Add</button>
+    </form>
+
+    <main id="list-container">
+      <section id="active-section" class="list-section">
+        <h2>To Get</h2>
+        <ul id="active-list" class="item-list"></ul>
+        <p id="empty-message" class="empty-message">No items yet. Add something above!</p>
+      </section>
+
+      <section id="checked-section" class="list-section checked-section">
+        <h2>Done</h2>
+        <ul id="checked-list" class="item-list"></ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

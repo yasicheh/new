@@ -1,0 +1,19 @@
+{
+  "name": "grocery-list-app",
+  "version": "1.0.0",
+  "description": "A shared grocery list app for partners",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
